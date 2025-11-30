@@ -171,32 +171,43 @@ By bridging **publicly available U.S. energy data** and **consumer decision tool
 ```
 .
 ├── 0_domain_study/
-├── 1_data_analysis/
+│   └── README.md
+├── 1_problem_identification/
+│   └── README.md
 ├── 2_data_collection/
+│   └── README.md
 ├── 3_data_analysis/
-├── 3_reports/
-│   └── m4_communication/
-│       ├── artifacts/
-│       └── strategy.md
-├── 5_final_presentation/
-├── planning/
-│   ├── README.md
-│   └── meeting_notes.md
-├── data/
-│   ├── README.md
-│   ├── raw/        # git-ignored placeholder
-│   └── processed/  # git-ignored placeholder
-├── .github/
-│   └── pull_request_template.md
+│   └── README.md
+├── 4_Communicating_Results/
+│   └── README.md
 ├── scripts/
 │   ├── app.py
+│   ├── app_improved.py
 │   ├── api.py
-│   ├── templates/
-│   ├── static/
+│   ├── analysis_helpers.py
+│   ├── config.py
+│   ├── validators.py
+│   ├── swagger_spec.py
+│   ├── logger.py
 │   ├── Dockerfile
-│   └── docker-compose.yml
-├── README.md
-└── .env.example
+│   ├── docker-compose.yml
+│   ├── README.md
+│   ├── requirements.txt
+│   ├── .env.example
+│   ├── data/
+│   ├── static/
+│   │   └── css/
+│   │       └── style.css
+│   └── templates/
+│       ├── advanced_budget_analysis.html
+│       ├── base.html
+│       ├── budget_analysis.html
+│       ├── index.html
+│       ├── results.html
+│       └── sizing.html
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
 
 ## 8. Data Sources and References
