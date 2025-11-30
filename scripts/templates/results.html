@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Solar Resource Analysis Platform{% endblock %}
+
+{% block content %}
+<div class="results-container">
+    <div class="results-header">
+        <h2>Solar Energy Analysis</h2>
+        <div class="location-info">
+            <p><strong>Address:</strong> {{ address }}</p>
+            <p><strong>Coordinates:</strong> {{ "{:.4f}".format(lat) if lat else 'N/A' }}, {{ "{:.4f}".format(lon) if lon else 'N/A' }}</p>
+        </div>
+    </div>
+
+    {% if solar_data and solar_data.outputs %}
+    <div class="results-grid">
+        <div class="result-card">
+            <h3>☀️ Solar Irradiance Data</h3>
+            <div class="metric-grid">
+                {% if solar_data.outputs.avg_dni %}
+                <div class="metric">
+                    <div class="metric-label">DNI (Direct Normal Irradiance)</div>
+                    <div class="metric-value">{{ "{:.2f}".format(solar_data.outputs.avg_dni.annual) if solar_data.outputs.avg_dni.annual else 'N/A' }}</div>
+                    <div class="metric-unit">kWh/m²/day</div>
+                </div>
+                {% endif %}
+
+                {% if solar_data.outputs.avg_ghi %}
+                <div class="metric">
+                    <div class="metric-label">GHI (Global Horizontal Irradiance)</div>
+                    <div class="metric-value">{{ "{:.2f}".format(solar_data.outputs.avg_ghi.annual) if solar_data.outputs.avg_ghi.annual else 'N/A' }}</div>
+                    <div class="metric-unit">kWh/m²/day</div>
+                </div>
+                {% endif %}
+
+                {% if solar_data.outputs.avg_lat_tilt %}
+                <div class="metric">
+                    <div class="metric-label">Optimal Tilt Angle</div>
+                    <div class="metric-value">{{ "{:.2f}".format(solar_data.outputs.avg_lat_tilt.annual) if solar_data.outputs.avg_lat_tilt.annual else 'N/A' }}</div>
+                    <div class="metric-unit">kWh/m²/day</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if pvwatts_data and pvwatts_data.outputs %}
+        <div class="result-card">
+            <h3>⚡ PV System Estimation</h3>
+            <div class="system-info">
+                <p><strong>System Capacity:</strong> {{ system_capacity }} kW</p>
+            </div>
+            <div class="metric-grid">
+                {% if pvwatts_data.outputs.ac_annual %}
+                <div class="metric highlight">
+                    <div class="metric-label">Annual Energy Output</div>
+                    <div class="metric-value">{{ "{:,.0f}".format(pvwatts_data.outputs.ac_annual) if pvwatts_data.outputs.ac_annual else 'N/A' }}</div>
+                    <div class="metric-unit">kWh/year</div>
+                </div>
+                {% endif %}
+
+                {% if pvwatts_data.outputs.capacity_factor %}
+                <div class="metric">
+                    <div class="metric-label">Capacity Factor</div>
+                    <div class="metric-value">{{ "{:.1f}".format(pvwatts_data.outputs.capacity_factor) if pvwatts_data.outputs.capacity_factor else 'N/A' }}</div>
+                    <div class="metric-unit">%</div>
+                </div>
+                {% endif %}
+
+                {% if pvwatts_data.outputs.ac_annual and system_capacity %}
+                <div class="metric">
+                    <div class="metric-label">Specific Yield</div>
+                    <div class="metric-value">{{ "{:,.0f}".format(pvwatts_data.outputs.ac_annual / system_capacity) if pvwatts_data.outputs.ac_annual and system_capacity else 'N/A' }}</div>
+                    <div class="metric-unit">kWh/kW/year</div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if pvwatts_data.outputs.ac_monthly %}
+            <div class="monthly-data">
+                <h4>Monthly Output (kWh)</h4>
+                <div class="monthly-grid">
+                    {% set months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+                    {% for i in range(12) %}
+                    <div class="monthly-item">
+                        <div class="month-name">{{ months[i] }}</div>
+                        <div class="month-value">{{ "{:,.0f}".format(pvwatts_data.outputs.ac_monthly[i]) if pvwatts_data.outputs.ac_monthly[i] else 'N/A' }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="result-card">
+            <h3>⚡ PV System Estimation</h3>
+            <div class="alert alert-warning">
+                <span class="alert-icon">⚠️</span>
+                PVWatts data is currently unavailable. The solar irradiance data above still shows the location's potential.
+            </div>
+        </div>
+        {% endif %}
+
+        {% if pvwatts_data and pvwatts_data.outputs %}
+        <div class="result-card">
+            <h3>💰 Economic Analysis</h3>
+            {% if pvwatts_data.outputs.ac_annual %}
+            {% set annual_kwh = pvwatts_data.outputs.ac_annual %}
+            {% set rate = electricity_rate if electricity_rate is not none else 0.30 %}
+            <div class="system-info">
+                <p><strong>Utility Rate Used:</strong>
+                    {{ "${:.2f}/kWh".format(rate) }}
+                    {% if utility_meta and utility_meta.name %}
+                        ({{ utility_meta.name }})
+                    {% endif %}
+                    {% if sector %}
+                        — Sector: {{ sector|capitalize }}
+                    {% endif %}
+                </p>
+            </div>
+            {% set annual_savings = annual_kwh * rate %}
+            <div class="metric-grid">
+                <div class="metric">
+                    <div class="metric-label">Annual Electricity Cost Savings</div>
+                    <div class="metric-value">{{ "{:,.0f}".format(annual_savings) if annual_savings else 'N/A' }}</div>
+                    <div class="metric-unit">$/year</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">20-Year Savings</div>
+                    <div class="metric-value">{{ "{:,.0f}".format(annual_savings * 20) if annual_savings else 'N/A' }}</div>
+                    <div class="metric-unit">$</div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                <span class="alert-icon">⚠️</span>
+                Economic analysis unavailable without PVWatts data.
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="actions">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">← New Analysis</a>
+    </div>
+</div>
+{% endblock %}

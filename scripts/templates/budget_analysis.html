@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Budget-Analyse - Solar Resource Analysis Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ba-header { text-align: center; margin-bottom: 24px; }
+    .budget-badge { display: inline-block; padding: 8px 14px; border-radius: 20px; font-weight: 600; margin-top: 8px; }
+    .budget-small { background: #ffd700; }
+    .budget-medium { background: #87ceeb; }
+    .budget-large { background: #98fb98; }
+    .scenarios { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 20px 0; }
+    .scenario-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; background: #fff; transition: transform .2s ease, box-shadow .2s ease; }
+    .scenario-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+    .scenario-card.recommended { border-color: #4CAF50; background: #f1f8e9; }
+    .metric { display: flex; justify-content: space-between; margin: 8px 0; padding: 4px 0; border-bottom: 1px solid #f1f5f9; }
+    .metric-value { font-weight: 600; color: #1f2937; }
+    .chart-container { position: relative; height: 360px; margin: 24px 0; }
+    .roi-indicator { font-size: 18px; font-weight: 700; text-align: center; padding: 8px; border-radius: 6px; }
+    .roi-positive { background: #c8e6c9; color: #2e7d32; }
+    .roi-negative { background: #ffcdd2; color: #c62828; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ba-header">
+    <h2>🌞 Solar-Analyse für {{ address }}</h2>
+    <div class="budget-badge budget-{{ budget_level }}">
+        Budget: {{ budget_name }} (${{ "%.0f"|format(budget_range.min) }} - ${{ "%.0f"|format(budget_range.max) }})
+    </div>
+    {% if electricity_rate %}
+    <div style="color:#64748b; font-size: 14px; margin-top:6px;">Tarif: ${{ "{:.2f}".format(electricity_rate) }}/kWh • Kostenannahme: ${{ "{:.0f}".format(cost_per_kw) }}/kW</div>
+    {% endif %}
+</div>
+
+<div class="scenarios">
+    {% for scenario in scenarios %}
+    <div class="scenario-card {% if loop.index == 2 %}recommended{% endif %}">
+        {% if loop.index == 2 %}
+        <div style="background:#4CAF50;color:#fff;margin:-16px -16px 10px -16px;padding:8px 12px;border-radius:10px 10px 0 0;">⭐ Empfohlen</div>
+        {% endif %}
+
+        <h3>{{ "%.1f"|format(scenario.capacity_kw) }} kW Anlage</h3>
+
+        <div class="metric"><span>💰 Investition:</span><span class="metric-value">${{ "%.0f"|format(scenario.investment) }}</span></div>
+        <div class="metric"><span>⚡ Jährliche Produktion:</span><span class="metric-value">{{ "%.0f"|format(scenario.annual_production) }} kWh</span></div>
+        <div class="metric"><span>💵 Jährliche Ersparnis:</span><span class="metric-value">${{ "%.0f"|format(scenario.annual_savings) }}</span></div>
+        <div class="metric"><span>📅 Amortisation:</span><span class="metric-value">{{ "%.1f"|format(scenario.payback_years) }} Jahre</span></div>
+
+        <div class="roi-indicator {% if scenario.net_25y_profit > 0 %}roi-positive{% else %}roi-negative{% endif %}">25-Jahre ROI: {{ "%.0f"|format(scenario.roi_25y) }}%</div>
+        <div class="metric"><span>💸 Nettogewinn (25J):</span><span class="metric-value">${{ "%.0f"|format(scenario.net_25y_profit) }}</span></div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="chart-container"><canvas id="savingsChart"></canvas></div>
+<div class="chart-container"><canvas id="roiChart"></canvas></div>
+
+<div class="actions" style="text-align:center; margin-top: 12px;">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">← Neue Analyse</a>
+    <a href="{{ url_for('index') }}#addressForm" class="btn btn-primary" style="margin-left:8px;">Adresse ändern</a>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Ersparnisse über Zeit
+const savingsCtx = document.getElementById('savingsChart').getContext('2d');
+new Chart(savingsCtx, {
+  type: 'line',
+  data: {
+    labels: [{% for year in range(1, 26) %}'Jahr {{ year }}'{% if not loop.last %},{% endif %}{% endfor %}],
+    datasets: [
+      {% for scenario in scenarios %}
+      {
+        label: '{{ "%.1f"|format(scenario.capacity_kw) }} kW',
+        data: [{% for proj in scenario.projection %}{{ "%.0f"|format(proj.cumulative_savings) }}{% if not loop.last %},{% endif %}{% endfor %}],
+        borderColor: {% if loop.index == 1 %}'#ff9800'{% elif loop.index == 2 %}'#4CAF50'{% else %}'#2196F3'{% endif %},
+        backgroundColor: {% if loop.index == 1 %}'rgba(255,152,0,0.1)'{% elif loop.index == 2 %}'rgba(76,175,80,0.1)'{% else %}'rgba(33,150,243,0.1)'{% endif %},
+        tension: 0.4,
+        fill: true
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { title: { display: true, text: 'Kumulative Ersparnisse über 25 Jahre', font: { size: 16 } }, legend: { position: 'top' } },
+    scales: { y: { beginAtZero: true, ticks: { callback: (v) => '$' + Number(v).toLocaleString() } } }
+  }
+});
+
+// ROI Chart
+const roiCtx = document.getElementById('roiChart').getContext('2d');
+new Chart(roiCtx, {
+  type: 'line',
+  data: {
+    labels: [{% for year in range(1, 26) %}'Jahr {{ year }}'{% if not loop.last %},{% endif %}{% endfor %}],
+    datasets: [
+      {% for scenario in scenarios %}
+      {
+        label: '{{ "%.1f"|format(scenario.capacity_kw) }} kW',
+        data: [{% for proj in scenario.projection %}{{ "%.0f"|format(proj.net_profit) }}{% if not loop.last %},{% endif %}{% endfor %}],
+        borderColor: {% if loop.index == 1 %}'#ff9800'{% elif loop.index == 2 %}'#4CAF50'{% else %}'#2196F3'{% endif %},
+        backgroundColor: {% if loop.index == 1 %}'rgba(255,152,0,0.1)'{% elif loop.index == 2 %}'rgba(76,175,80,0.1)'{% else %}'rgba(33,150,243,0.1)'{% endif %},
+        tension: 0.4,
+        fill: false
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { title: { display: true, text: 'Return on Investment (Nettogewinn)', font: { size: 16 } }, legend: { position: 'top' } },
+    scales: { y: { ticks: { callback: (v) => '$' + Number(v).toLocaleString() } } },
+    interaction: { mode: 'index', intersect: false }
+  }
+});
+</script>
+{% endblock %}
+

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Sizing Result - Solar Resource Analysis Platform{% endblock %}
+
+{% block content %}
+<div class="results-container">
+    <div class="results-header">
+        <h2>PV System Sizing Recommendation</h2>
+        <div class="location-info">
+            <p><strong>Address:</strong> {{ address }}</p>
+            <p><strong>Coordinates:</strong> {{ "{:.4f}".format(lat) if lat else 'N/A' }}, {{ "{:.4f}".format(lon) if lon else 'N/A' }}</p>
+        </div>
+    </div>
+
+    <div class="results-grid">
+        <div class="result-card">
+            <h3>Input & Assumptions</h3>
+            <div class="system-info">
+                <p><strong>Monthly Bill:</strong> {{ "$ {:,.2f}".format(monthly_bill) }}</p>
+                <p><strong>Utility Rate:</strong>
+                    {{ "${:.2f}/kWh".format(electricity_rate) }}
+                    {% if utility_meta and utility_meta.name %} ({{ utility_meta.name }}){% endif %}
+                    — Sector: {{ sector|capitalize }}
+                </p>
+                <p><strong>Estimated Consumption:</strong> {{ "{:,.0f}".format(monthly_kwh) if monthly_kwh else 'N/A' }} kWh/month · {{ "{:,.0f}".format(annual_kwh) if annual_kwh else 'N/A' }} kWh/year</p>
+            </div>
+        </div>
+
+        <div class="result-card">
+            <h3>Recommended Size</h3>
+            <div class="metric-grid">
+                <div class="metric highlight">
+                    <div class="metric-label">Recommended Capacity</div>
+                    <div class="metric-value">{{ "{:.1f}".format(recommended_capacity) if recommended_capacity else 'N/A' }}</div>
+                    <div class="metric-unit">kW (DC)</div>
+                </div>
+                {% if expected and expected.outputs and expected.outputs.ac_annual %}
+                <div class="metric">
+                    <div class="metric-label">Expected Annual Output</div>
+                    <div class="metric-value">{{ "{:,.0f}".format(expected.outputs.ac_annual) }}</div>
+                    <div class="metric-unit">kWh/year</div>
+                </div>
+                {% endif %}
+                {% if investment_cost_usd %}
+                <div class="metric">
+                    <div class="metric-label">Investment Cost</div>
+                    <div class="metric-value">{{ "{:,.0f}".format(investment_cost_usd) }}</div>
+                    <div class="metric-unit">$</div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if expected and expected.outputs and expected.outputs.ac_monthly %}
+            <div class="monthly-data">
+                <h4>Estimated Monthly Output</h4>
+                <div class="monthly-grid">
+                    {% set months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+                    {% for i in range(12) %}
+                    <div class="monthly-item">
+                        <div class="month-name">{{ months[i] }}</div>
+                        <div class="month-value">{{ "{:,.0f}".format(expected.outputs.ac_monthly[i]) }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="result-card">
+            <h3>Economics (Optional)</h3>
+            <div class="system-info">
+                <p><strong>Rate Used:</strong> {{ "${:.2f}/kWh".format(electricity_rate) }}
+                    {% if utility_meta and utility_meta.name %} ({{ utility_meta.name }}){% endif %}
+                    — Sector: {{ sector|capitalize }}
+                </p>
+                <p><strong>Cost Assumption:</strong> $2,500/kW ($2.50/watt)</p>
+            </div>
+            <div class="metric-grid">
+                <div class="metric">
+                    <div class="metric-label">Annual Offset Energy</div>
+                    <div class="metric-value">{{ "{:,.0f}".format(annual_offset_kwh) if annual_offset_kwh else 'N/A' }}</div>
+                    <div class="metric-unit">kWh/year</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Annual Savings</div>
+                    <div class="metric-value">{{ "{:,.0f}".format(annual_savings_usd) if annual_savings_usd else 'N/A' }}</div>
+                    <div class="metric-unit">$/year</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Payback</div>
+                    <div class="metric-value">{{ "{:.1f}".format(payback_years) if payback_years else 'N/A' }}</div>
+                    <div class="metric-unit">years</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">ROI</div>
+                    <div class="metric-value">{{ "{:.1%}".format(roi) if roi else 'N/A' }}</div>
+                    <div class="metric-unit">annual</div>
+                </div>
+            </div>
+            <div class="economic-note">
+                <small>* Savings use offset energy (min[expected output, your usage]) and selected sector rate. Costs exclude incentives, financing, and degradation.</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">← Back</a>
+    </div>
+</div>
+{% endblock %}

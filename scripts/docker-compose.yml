@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  solar-app:
+    build: .
+    container_name: solar-resource-app
+    ports:
+      - "5001:5000"
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - solar-network
+
+networks:
+  solar-network:
+    driver: bridge

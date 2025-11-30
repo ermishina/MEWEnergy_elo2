@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}Solar Energy Analysis Platform - MIT Energy Initiative{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header" style="background: linear-gradient(135deg, #a31f34 0%, #8a8b8c 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px;">
+        <h2 style="color: white;">Solar Energy Analysis Platform</h2>
+        <p style="color: #f0f0f0;">Advanced Photovoltaic System Optimization & Financial Modeling</p>
+    </div>
+
+    <!-- Two-Column Layout for Forms -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; align-items: start;">
+
+    <!-- Standard PV Analysis -->
+    <form method="POST" action="{{ url_for('search_address') }}" class="address-form" id="addressForm">
+        <h3 style="color: #a31f34; border-bottom: 2px solid #a31f34; padding-bottom: 10px;">
+            Standard Solar Resource Analysis
+        </h3>
+        
+        <div class="form-group">
+            <label for="address" class="form-label">
+                Installation Address <span class="required">*</span>
+            </label>
+            <input
+                type="text"
+                id="address"
+                name="address"
+                class="form-input"
+                placeholder="e.g., 77 Massachusetts Avenue, Cambridge, MA 02139"
+                required
+                autocomplete="street-address"
+            >
+            <div class="form-help">
+                Provide complete installation site address for precise irradiation analysis.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="system_capacity" class="form-label">
+                System Capacity (kWdc)
+            </label>
+            <input
+                type="number"
+                id="system_capacity"
+                name="system_capacity"
+                class="form-input"
+                value="5.0"
+                min="0.1"
+                max="1000"
+                step="0.1"
+            >
+            <div class="form-help">
+                DC nameplate capacity of the proposed photovoltaic array.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Rate Schedule Classification</label>
+            <div class="radio-group">
+                <label class="radio-option">
+                    <input type="radio" name="sector" value="residential" checked>
+                    Residential (Schedule R)
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="sector" value="commercial">
+                    Commercial (Schedule G)
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="sector" value="industrial">
+                    Industrial (Schedule L)
+                </label>
+            </div>
+            <div class="form-help">
+                Select applicable utility rate schedule for economic analysis.
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <span class="btn-text">Initialize Analysis</span>
+                <span class="btn-loading" style="display: none;">
+                    <span class="spinner"></span>
+                    Processing...
+                </span>
+            </button>
+        </div>
+    </form>
+
+    <!-- Advanced Budget Analysis with Battery Storage -->
+    <div style="display: flex; flex-direction: column;">
+        <h3 style="color: #a31f34; border-bottom: 2px solid #a31f34; padding-bottom: 10px; margin-top: 0;">
+            📊 Advanced Financial Modeling with Energy Storage Systems
+        </h3>
+        <p style="text-align:center; color:#4a5568; margin-bottom: 1.5rem;">
+            Comprehensive techno-economic analysis integrating solar PV with battery energy storage systems (BESS)
+        </p>
+
+        <form method="POST" action="{{ url_for('advanced_budget_analysis') }}" class="address-form" id="advancedBudgetForm">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; align-items: start;">
+            <!-- Location Section -->
+            <fieldset style="border: 1px solid #e5e7eb; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+                <legend style="color: #a31f34; font-weight: bold;">Site Information</legend>
+                
+                <div class="form-group">
+                    <label for="budget_address" class="form-label">
+                        Installation Address <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="budget_address" 
+                        name="address" 
+                        class="form-input" 
+                        placeholder="e.g., 77 Massachusetts Avenue, Cambridge, MA 02139" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="monthly_consumption" class="form-label">
+                        Average Monthly Electricity Cost (USD) <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="number" 
+                        id="monthly_consumption" 
+                        name="monthly_bill" 
+                        class="form-input" 
+                        placeholder="e.g., 250" 
+                        min="0" 
+                        step="0.01"
+                        required
+                    >
+                    <div class="form-help">
+                        Used to calculate baseline consumption and load profile estimation.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Facility Type</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="sector" value="residential" checked> 
+                            Residential
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sector" value="commercial"> 
+                            Commercial
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sector" value="industrial"> 
+                            Industrial
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Financial Parameters -->
+            <fieldset style="border: 1px solid #e5e7eb; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+                <legend style="color: #a31f34; font-weight: bold;">Financial Parameters</legend>
+                
+                <div class="form-group">
+                    <label for="budget" class="form-label">
+                        Capital Expenditure Budget <span class="required">*</span>
+                    </label>
+                    <select id="budget" name="budget" class="form-input">
+                        <option value="small">Entry Level ($10,000 - $20,000)</option>
+                        <option value="medium" selected>Standard ($20,000 - $40,000)</option>
+                        <option value="large">Premium ($40,000 - $80,000)</option>
+                        <option value="enterprise">Enterprise ($80,000 - $150,000)</option>
+                        <option value="custom">Custom Budget Range</option>
+                    </select>
+                </div>
+
+                <!-- Custom Budget Fields -->
+                <div id="customBudgetFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="custom_min" class="form-label">Minimum CAPEX (USD)</label>
+                        <input type="number" id="custom_min" name="custom_min" class="form-input" min="5000" step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="custom_max" class="form-label">Maximum CAPEX (USD)</label>
+                        <input type="number" id="custom_max" name="custom_max" class="form-input" min="5000" step="1000">
+                    </div>
+                </div>
+
+            </fieldset>
+
+            <!-- Battery Energy Storage System (BESS) Configuration -->
+            <fieldset style="border: 2px solid #a31f34; padding: 15px; margin-bottom: 20px; border-radius: 8px; background: #fef9f9; grid-column: 1 / -1;">
+                <legend style="color: #a31f34; font-weight: bold;">⚡ Battery Energy Storage System (BESS)</legend>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="include_battery" name="include_battery" value="true" onchange="toggleBatteryOptions()">
+                        <strong>Include Battery Energy Storage System</strong>
+                    </label>
+                </div>
+
+                <div id="batteryOptions" style="display: none; margin-top: 15px;">
+                    <div class="form-group">
+                        <label for="battery_chemistry" class="form-label">Battery Chemistry</label>
+                        <select id="battery_chemistry" name="battery_chemistry" class="form-input">
+                            <option value="lfp" selected>LFP (Lithium Iron Phosphate) - $450/kWh</option>
+                            <option value="nmc">NMC (Nickel Manganese Cobalt) - $550/kWh</option>
+                            <option value="lto">LTO (Lithium Titanate) - $800/kWh</option>
+                        </select>
+                        <div class="form-help">
+                            Chemistry affects cost, cycle life, and round-trip efficiency.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Battery Capacity Options (Select Multiple)</label>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="battery_sizes" value="5" checked>
+                                5 kWh (Starter)
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="battery_sizes" value="10" checked>
+                                10 kWh (Standard)
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="battery_sizes" value="13.5">
+                                13.5 kWh (Tesla Powerwall)
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="battery_sizes" value="20" checked>
+                                20 kWh (Extended)
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="battery_sizes" value="30">
+                                30 kWh (Commercial)
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="battery_sizes" value="40">
+                                40 kWh (Industrial)
+                            </label>
+                        </div>
+                        <div class="form-help">
+                            Compare multiple battery configurations for optimal sizing.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="battery_power" class="form-label">Maximum Discharge Power (kW)</label>
+                        <input 
+                            type="number" 
+                            id="battery_power" 
+                            name="battery_power" 
+                            class="form-input" 
+                            value="5" 
+                            min="1" 
+                            max="50" 
+                            step="0.5"
+                        >
+                        <div class="form-help">
+                            Peak power output capability (C-rate dependent).
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dod" class="form-label">Depth of Discharge (DoD) %</label>
+                        <input 
+                            type="number" 
+                            id="dod" 
+                            name="dod" 
+                            class="form-input" 
+                            value="90" 
+                            min="50" 
+                            max="100" 
+                            step="5"
+                        >
+                        <div class="form-help">
+                            Usable capacity percentage to preserve battery life.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="round_trip_efficiency" class="form-label">Round-Trip Efficiency (%)</label>
+                        <input 
+                            type="number" 
+                            id="round_trip_efficiency" 
+                            name="round_trip_efficiency" 
+                            class="form-input" 
+                            value="92" 
+                            min="80" 
+                            max="98" 
+                            step="1"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="backup_reserve" class="form-label">Backup Power Reserve (%)</label>
+                        <input 
+                            type="number" 
+                            id="backup_reserve" 
+                            name="backup_reserve" 
+                            class="form-input" 
+                            value="20" 
+                            min="0" 
+                            max="50" 
+                            step="5"
+                        >
+                        <div class="form-help">
+                            Percentage of battery capacity reserved for grid outages.
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            </div>
+
+            <div class="form-actions" style="text-align:center;">
+                <button type="submit" class="btn btn-primary" id="advancedBtn" style="background: linear-gradient(135deg, #a31f34 0%, #8a8b8c 100%); padding: 12px 30px; font-size: 16px;">
+                    <span class="btn-text">🚀 Execute Comprehensive Analysis</span>
+                    <span class="btn-loading" style="display: none;">
+                        <span class="spinner"></span>
+                        Performing Analysis...
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Toggle battery options visibility
+function toggleBatteryOptions() {
+    const checkbox = document.getElementById('include_battery');
+    const options = document.getElementById('batteryOptions');
+    options.style.display = checkbox.checked ? 'block' : 'none';
+    
+    // Set required attributes
+    const batteryInputs = options.querySelectorAll('input[type="number"], select');
+    batteryInputs.forEach(input => {
+        input.required = checkbox.checked;
+    });
+}
+
+// Show/hide custom budget fields
+document.getElementById('budget').addEventListener('change', function() {
+    const customFields = document.getElementById('customBudgetFields');
+    if (this.value === 'custom') {
+        customFields.style.display = 'block';
+        document.getElementById('custom_min').required = true;
+        document.getElementById('custom_max').required = true;
+    } else {
+        customFields.style.display = 'none';
+        document.getElementById('custom_min').required = false;
+        document.getElementById('custom_max').required = false;
+    }
+});
+
+// Form submission handlers
+document.getElementById('advancedBudgetForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('advancedBtn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnLoading = submitBtn.querySelector('.btn-loading');
+
+    // Validate battery options if selected
+    if (document.getElementById('include_battery').checked) {
+        const checkedSizes = document.querySelectorAll('input[name="battery_sizes"]:checked');
+        if (checkedSizes.length === 0) {
+            alert('Please select at least one battery capacity option.');
+            e.preventDefault();
+            return false;
+        }
+    }
+
+    btnText.style.display = 'none';
+    btnLoading.style.display = 'inline-flex';
+    submitBtn.disabled = true;
+});
+</script>
+
+<style>
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.checkbox-option:hover {
+    background: #f9fafb;
+    border-color: #a31f34;
+}
+
+.checkbox-option input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+fieldset {
+    position: relative;
+}
+
+legend {
+    padding: 0 10px;
+    background: white;
+}
+</style>
+{% endblock %}

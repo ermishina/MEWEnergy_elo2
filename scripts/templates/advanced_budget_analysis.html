@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIT Solar + Storage Analysis Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* MIT-themed professional styling */
+        :root {
+            --mit-red: #a31f34;
+            --mit-gray: #8a8b8c;
+            --mit-light-gray: #c2c0bf;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--mit-red) 0%, var(--mit-gray) 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: -30px -30px 30px -30px;
+            text-align: center;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .metric-card {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .scenario-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .scenario-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .scenario-card.optimal {
+            border-color: var(--mit-red);
+            background: #fef9f9;
+        }
+        
+        .battery-visual {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .battery-icon {
+            width: 60px;
+            height: 100px;
+            border: 3px solid #333;
+            border-radius: 5px;
+            position: relative;
+            background: linear-gradient(to top, #4CAF50 var(--fill), #e0e0e0 var(--fill));
+        }
+        
+        .evening-duration {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--mit-red);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MIT Energy Initiative</h1>
+            <h2>Solar + Storage Techno-Economic Analysis</h2>
+            <p>{{ location.address }}</p>
+        </div>
+        
+        <!-- Consumption Profile -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <h4>Annual Consumption</h4>
+                <div style="font-size: 24px; color: var(--mit-red);">
+                    {{ "%.0f"|format(consumption.annual_kwh) }} kWh
+                </div>
+                <small>Monthly: ${{ "%.2f"|format(consumption.monthly_cost) }}</small>
+            </div>
+            
+            <div class="metric-card">
+                <h4>Average Load</h4>
+                <div style="font-size: 24px; color: var(--mit-gray);">
+                    {{ "%.2f"|format(consumption.avg_load_kw) }} kW
+                </div>
+                <small>Daily: {{ "%.1f"|format(consumption.daily_kwh) }} kWh</small>
+            </div>
+            
+            <div class="metric-card">
+                <h4>Electricity Rate</h4>
+                <div style="font-size: 24px; color: #ff9800;">
+                    ${{ "%.3f"|format(rates.standard) }}/kWh
+                </div>
+                {% if rates.peak %}
+                <small>Peak: ${{ "%.3f"|format(rates.peak) }} | Off-Peak: ${{ "%.3f"|format(rates.off_peak) }}</small>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Scenario Comparison -->
+        <h3 style="color: var(--mit-red); border-bottom: 2px solid var(--mit-red); padding-bottom: 10px;">
+            System Configuration Analysis
+        </h3>
+        
+        <div class="scenario-comparison">
+            {% for scenario in scenarios %}
+            {% set is_selected = form_params.selected_scenario_index == loop.index0 %}
+            <div class="scenario-card {% if is_selected or loop.index == 2 %}optimal{% endif %}">
+                {% if is_selected or loop.index == 2 %}
+                                <div style="position: absolute; top: -12px; left: 20px; background: var(--mit-red); color: white; padding: 5px 15px; border-radius: 5px;">
+                    {% if is_selected %}✓ SELECTED CONFIGURATION{% else %}RECOMMENDED{% endif %}
+                </div>
+                {% endif %}
+                
+                <h4>{{ "%.1f"|format(scenario.solar_kw) }} kW Solar 
+                {% if scenario.battery_kwh > 0 %}
+                + {{ "%.1f"|format(scenario.battery_kwh) }} kWh Battery
+                {% endif %}
+                </h4>
+                
+                {% if scenario.roof_configuration %}
+                <div style="text-align: center; margin: 10px 0; padding: 5px; background: #f0f0f0; border-radius: 4px; font-size: 12px;">
+                    <strong>Roof:</strong> {{ scenario.roof_configuration }} | <strong>Tilt:</strong> {{ "%.0f"|format(scenario.roof_tilt) }}°
+                </div>
+                {% endif %}
+                
+                {% if scenario.battery_kwh > 0 %}
+                <div class="battery-visual">
+                    <div>
+                        <div class="battery-icon" style="--fill: {{ scenario.evening_coverage_percent }}%;"></div>
+                        <small>{{ "%.0f"|format(scenario.evening_coverage_percent) }}% Evening</small>
+                    </div>
+                    
+                    <div class="evening-duration">
+                        {{ "%.1f"|format(scenario.backup_hours) }} hrs
+                        <div style="font-size: 14px; color: #666;">Backup Duration</div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="font-size: 20px; color: #4CAF50;">
+                            {{ "%.1f"|format(scenario.effective_capacity) }} kWh
+                        </div>
+                        <small>Usable Capacity</small>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                    <div>
+                        <strong>System Cost:</strong><br>
+                        ${{ "{:,.0f}".format(scenario.total_system_cost) }}
+                    </div>
+                    <div>
+                        <strong>After Incentives:</strong><br>
+                        <span style="color: #4CAF50;">${{ "{:,.0f}".format(scenario.total_cost_after_incentives) }}</span>
+                    </div>
+                    <div>
+                        <strong>Annual Savings:</strong><br>
+                        ${{ "{:,.0f}".format(scenario.annual_savings) }}
+                    </div>
+                    <div>
+                        <strong>Payback:</strong><br>
+                        {{ "%.1f"|format(scenario.simple_payback_years) }} years
+                    </div>
+                    <div>
+                        <strong>25-Year NPV:</strong><br>
+                        <span style="color: {% if scenario.npv > 0 %}#4CAF50{% else %}#f44336{% endif %};">
+                            ${{ "{:,.0f}".format(scenario.npv) }}
+                        </span>
+                    </div>
+                    <div>
+                        <strong>IRR:</strong><br>
+                        {{ "%.1f"|format(scenario.irr) }}%
+                    </div>
+                    <div>
+                        <strong>LCOE:</strong><br>
+                        ${{ "%.3f"|format(scenario.lcoe) }}/kWh
+                    </div>
+                    <div>
+                        <strong>25-Year Profit:</strong><br>
+                        <span style="color: #4CAF50; font-weight: bold;">
+                            ${{ "{:,.0f}".format(scenario.net_25y_profit) }}
+                        </span>
+                    </div>
+                </div>
+                
+                {% if scenario.battery_kwh > 0 %}
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                    <small style="color: #666;">
+                        Battery Chemistry: {{ scenario.battery_chemistry|upper }}<br>
+                        Daily Charge Potential: {{ "%.1f"|format(scenario.daily_charge_potential) }} kWh<br>
+                        {% if scenario.arbitrage_savings > 0 %}
+                        TOU Arbitrage: ${{ "%.0f"|format(scenario.arbitrage_savings) }}/year
+                        {% endif %}
+                    </small>
+                </div>
+                {% endif %}
+
+                <!-- Scenario Selection Button -->
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn-select-scenario" data-solar-kw="{{ "%.1f"|format(scenario.solar_kw) }}" data-battery-kwh="{{ scenario.battery_kwh }}"
+                            style="padding: 10px 20px; background: {% if is_selected or loop.index == 2 %}#4CAF50{% else %}#a31f34{% endif %}; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                        {% if is_selected %}✓ SELECTED{% elif loop.index == 2 %}✓ RECOMMENDED{% else %}SELECT THIS{% endif %}
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Interactive Charts -->
+        <div class="chart-container">
+            <canvas id="loadProfileChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="financialChart"></canvas>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="/" style="padding: 12px 30px; background: var(--mit-red); color: white; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                New Analysis
+            </a>
+        </div>
+    </div>
+
+    <!-- Hidden form for scenario recalculation -->
+    <form id="scenarioRecalcForm" method="POST" action="{{ url_for('advanced_budget_analysis') }}" style="display: none;">
+        <input type="hidden" name="address" value="{{ form_params.address }}">
+        <input type="hidden" name="sector" value="{{ form_params.sector }}">
+        <input type="hidden" name="budget" value="{{ form_params.budget }}">
+        <input type="hidden" name="monthly_bill" value="{{ form_params.monthly_bill }}">
+        <input type="hidden" name="discount_rate" value="{{ form_params.discount_rate }}">
+        <input type="hidden" name="battery_chemistry" value="{{ form_params.battery_chemistry }}">
+        <input type="hidden" name="battery_power" value="{{ form_params.battery_power }}">
+        <input type="hidden" name="dod" value="{{ form_params.dod }}">
+        <input type="hidden" name="round_trip_efficiency" value="{{ form_params.round_trip_efficiency }}">
+        <input type="hidden" name="backup_reserve" value="{{ form_params.backup_reserve }}">
+
+        <!-- Selected scenario tracking -->
+        <input type="hidden" name="selected_solar_kw" id="selectedSolarKw" value="">
+        <input type="hidden" name="selected_battery_kwh" id="selectedBatteryKwh" value="">
+
+        {% if form_params.include_battery %}
+        <input type="hidden" name="include_battery" value="true">
+        {% endif %}
+        {% if form_params.include_itc %}
+        <input type="hidden" name="include_itc" value="true">
+        {% endif %}
+        {% if form_params.include_srec %}
+        <input type="hidden" name="include_srec" value="true">
+        {% endif %}
+        {% if form_params.time_of_use %}
+        <input type="hidden" name="time_of_use" value="true">
+        {% endif %}
+        {% if form_params.net_metering %}
+        <input type="hidden" name="net_metering" value="true">
+        {% endif %}
+
+        {% for battery_size in form_params.battery_sizes %}
+        <input type="hidden" name="battery_sizes" value="{{ battery_size }}">
+        {% endfor %}
+    </form>
+
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+            // Realistic residential load profile: morning peak (7-9 AM), afternoon dip (1-3 PM), evening peak (6-8 PM), night minimum
+            const residentialLoadFactors = [
+                0.35, 0.30, 0.25, 0.22, 0.25, 0.38,  // 0-5: Deep night minimum, slight rise at dawn
+                0.52, 0.78, 0.82, 0.72, 0.65, 0.62,  // 6-11: Morning peak (7-9 AM), then decline
+                0.58, 0.55, 0.58, 0.65, 0.72, 0.88,  // 12-17: Afternoon - dip at noon, then gradual rise
+                1.00, 0.98, 0.88, 0.72, 0.55, 0.42   // 18-23: Strong evening peak (6-7 PM), then decline
+            ];
+
+            // Commercial load profile: minimal at night, sharp morning ramp-up, sustained business hours, sharp evening decline
+            const commercialLoadFactors = [
+                0.22, 0.18, 0.15, 0.15, 0.18, 0.28,  // 0-5: Deep night minimum
+                0.42, 0.75, 0.92, 1.00, 0.98, 0.95,  // 6-11: Sharp morning ramp-up to peak
+                0.92, 0.88, 0.90, 0.93, 0.85, 0.68,  // 12-17: Sustained business hours with slight dip
+                0.48, 0.32, 0.25, 0.22, 0.20, 0.22   // 18-23: Sharp evening decline, low night usage
+            ];
+            
+            // Select profile based on sector
+            const sector = '{{ form_params.sector }}';
+            const loadFactors = (sector === 'commercial' || sector === 'industrial') 
+                ? commercialLoadFactors 
+                : residentialLoadFactors;
+            
+            // Calculate base load to match daily consumption
+            const avgFactor = loadFactors.reduce((a, b) => a + b, 0) / 24;
+            const avgLoadKw = parseFloat('{{ consumption.avg_load_kw }}') || 2.0; // Fallback to 2.0 kW
+            const baseLoad = avgLoadKw / avgFactor;
+
+            // Debug logging (can be removed in production)
+            console.log('Load Profile Debug:', {
+                avgLoadKw: avgLoadKw,
+                avgFactor: avgFactor.toFixed(3),
+                baseLoad: baseLoad.toFixed(3),
+                sector: sector
+            });
+            
+            // Generate realistic solar generation curve
+            function getSolarGeneration(hour, peakCapacity) {
+                if (hour < 5 || hour > 19) return 0;
+                
+                // Bell curve for solar generation
+                const solarCurve = {
+                    5: 0.02, 6: 0.10, 7: 0.25, 8: 0.45,
+                    9: 0.65, 10: 0.80, 11: 0.90, 12: 0.95,
+                    13: 1.00, 14: 0.95, 15: 0.85, 16: 0.70,
+                    17: 0.50, 18: 0.25, 19: 0.08
+                };
+                
+                return (solarCurve[hour] || 0) * peakCapacity;
+            }
+            
+            // Calculate battery charge/discharge pattern
+            function getBatteryFlow(hour, loadData, solarData, batteryCapacity) {
+                const load = loadData[hour];
+                const solar = solarData[hour];
+                const netLoad = load - solar;
+                
+                // Simple battery logic: charge when excess solar, discharge in evening
+                if (solar > load && hour >= 9 && hour <= 15) {
+                    // Charging (negative values)
+                    return -Math.min(solar - load, batteryCapacity * 0.25);
+                } else if (netLoad > 0 && hour >= 17 && hour <= 22) {
+                    // Discharging (positive values)
+                    return Math.min(netLoad, batteryCapacity * 0.20);
+                }
+                return 0;
+            }
+            
+            // Generate load data
+            const loadData = loadFactors.map(factor => baseLoad * factor);
+            
+            // Determine solar and battery capacity for chart
+            // Use selected scenario if available, otherwise use optimal (scenarios[1])
+            let selectedSolarKw = {{ form_params.selected_solar_kw if form_params.selected_solar_kw else 'null' }};
+            let selectedBatteryKwh = {{ form_params.selected_battery_kwh if form_params.selected_battery_kwh else 'null' }};
+
+            const solarCapacity = selectedSolarKw !== null
+                ? selectedSolarKw
+                : {{ scenarios[1].solar_kw if scenarios and (scenarios|length) > 1 else 5.0 }};
+
+            const batteryCapacity = selectedBatteryKwh !== null
+                ? selectedBatteryKwh
+                : {{ scenarios[1].battery_kwh if scenarios and (scenarios|length) > 1 and scenarios[1].battery_kwh else 0 }};
+
+            console.log('Chart configuration:', {
+                solarCapacity,
+                batteryCapacity,
+                selectedSolarKw,
+                selectedBatteryKwh
+            });
+
+            // Generate solar data
+            const solarData = Array.from({length: 24}, (_, hour) => getSolarGeneration(hour, solarCapacity));
+
+            // Generate battery data if applicable
+            const batteryData = batteryCapacity > 0
+                ? Array.from({length: 24}, (_, hour) => getBatteryFlow(hour, loadData, solarData, batteryCapacity))
+                : null;
+            
+            // Load Profile Chart
+            const loadCtx = document.getElementById('loadProfileChart');
+            if (loadCtx) {
+                console.log('Creating load profile chart with data:', {
+                    loadDataLength: loadData.length,
+                    solarDataLength: solarData.length,
+                    batteryCapacity: batteryCapacity
+                });
+
+                new Chart(loadCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                        datasets: [
+                            {
+                                label: `${sector === 'commercial' ? 'Commercial' : 'Residential'} Load (kW)`,
+                                data: loadData,
+                                borderColor: '#ff9800',
+                                backgroundColor: 'rgba(255,152,0,0.1)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 2,
+                                pointHoverRadius: 5
+                            },
+                            {
+                                label: 'Solar Generation (kW)',
+                                data: solarData,
+                                borderColor: '#ffc107',
+                                backgroundColor: 'rgba(255,193,7,0.2)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 2,
+                                pointHoverRadius: 5
+                            }
+                            {% if (scenarios and scenarios[0].battery_kwh > 0) or (form_params.selected_battery_kwh and form_params.selected_battery_kwh > 0) %},
+                            {
+                                label: 'Battery Flow (+ discharge / - charge)',
+                                data: batteryData,
+                                borderColor: '#4CAF50',
+                                backgroundColor: function(context) {
+                                    if (!context || !context.parsed || context.parsed.y === undefined || context.parsed.y === null) {
+                                        return 'rgba(76,175,80,0.1)'; // Default if no data
+                                    }
+                                    const value = context.parsed.y;
+                                    return value > 0
+                                        ? 'rgba(76,175,80,0.3)'  // Green for discharge
+                                        : value < 0
+                                        ? 'rgba(33,150,243,0.3)' // Blue for charge
+                                        : 'rgba(128,128,128,0.1)'; // Gray for zero
+                                },
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 2,
+                                pointHoverRadius: 5
+                            }
+                            {% endif %}
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Realistic Daily Load Profile & Energy Flow',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 15
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        try {
+                                            if (!context || !context.parsed || context.parsed.y === undefined || context.parsed.y === null) {
+                                                return (context && context.dataset && context.dataset.label) || '';
+                                            }
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            label += context.parsed.y.toFixed(2) + ' kW';
+
+                                            // Add context for battery
+                                            if (label.includes('Battery')) {
+                                                if (context.parsed.y < 0) {
+                                                    label += ' (charging)';
+                                                } else if (context.parsed.y > 0) {
+                                                    label += ' (discharging)';
+                                                }
+                                            }
+                                            return label;
+                                        } catch(e) {
+                                            return (context && context.dataset && context.dataset.label) || 'N/A';
+                                        }
+                                    },
+                                    afterBody: function(tooltipItems) {
+                                        try {
+                                            if (!tooltipItems || tooltipItems.length === 0) return '';
+
+                                            const hour = tooltipItems[0].dataIndex;
+                                            const load = loadData[hour];
+                                            const solar = solarData[hour];
+                                            const netLoad = (load - solar).toFixed(2);
+
+                                            return `\nNet Load: ${netLoad} kW ${netLoad > 0 ? '(from grid)' : '(to grid)'}`;
+                                        } catch(e) {
+                                            return '';
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Hour of Day'
+                                },
+                                grid: {
+                                    display: true,
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Power (kW)'
+                                },
+                                grid: {
+                                    display: true,
+                                    color: 'rgba(0,0,0,0.05)'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toFixed(1) + ' kW';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Financial comparison chart
+            const finCtx = document.getElementById('financialChart');
+            if (finCtx) {
+                new Chart(finCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: [
+                            {% for scenario in scenarios %}
+                            '{{ "%.1f"|format(scenario.solar_kw) }}kW{% if scenario.battery_kwh > 0 %} + {{ "%.0f"|format(scenario.battery_kwh) }}kWh{% endif %}'
+                            {% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        ],
+                        datasets: [
+                            {
+                                label: 'Initial Investment (After ITC)',
+                                data: [{% for s in scenarios %}{{ s.total_cost_after_incentives }}{% if not loop.last %},{% endif %}{% endfor %}],
+                                backgroundColor: 'rgba(244,67,54,0.7)'
+                            },
+                            {
+                                label: '25-Year Total Savings',
+                                data: [{% for s in scenarios %}{{ s.cumulative_25y_savings if s.cumulative_25y_savings else s.annual_savings * 25 }}{% if not loop.last %},{% endif %}{% endfor %}],
+                                backgroundColor: 'rgba(76,175,80,0.7)'
+                            },
+                            {
+                                label: 'Net Profit',
+                                data: [{% for s in scenarios %}{{ s.net_25y_profit if s.net_25y_profit else (s.annual_savings * 25 - s.total_cost_after_incentives) }}{% if not loop.last %},{% endif %}{% endfor %}],
+                                backgroundColor: 'rgba(33,150,243,0.7)'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Financial Performance Comparison',
+                                font: { size: 16 }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Amount (USD)'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Scenario Selection Handler
+            document.querySelectorAll('.btn-select-scenario').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    const solarKw = parseFloat(this.dataset.solarKw);
+                    const batteryKwh = parseFloat(this.dataset.batteryKwh);
+
+                    console.log('Selecting scenario:', { solarKw, batteryKwh });
+
+                    // Fill hidden form fields with selected values
+                    document.getElementById('selectedSolarKw').value = solarKw;
+                    document.getElementById('selectedBatteryKwh').value = batteryKwh;
+
+                    // Show loading state
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<span class="spinner"></span> Recalculating...';
+                    this.disabled = true;
+
+                    // Submit the form
+                    setTimeout(() => {
+                        document.getElementById('scenarioRecalcForm').submit();
+                    }, 300);
+                });
+            });
+            } catch(error) {
+                console.error('Error creating charts:', error);
+                console.error('Error details:', error.stack);
+
+                // Display error message on page
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'background: #ffebee; color: #c62828; padding: 20px; margin: 20px; border-radius: 5px; border: 1px solid #ef5350;';
+                errorDiv.innerHTML = '<strong>Chart Loading Error:</strong> ' + error.message + '<br><small>Check browser console for details.</small>';
+
+                const container = document.querySelector('.container');
+                if (container) {
+                    container.insertBefore(errorDiv, container.firstChild);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
