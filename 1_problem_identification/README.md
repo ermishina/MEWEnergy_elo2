@@ -1,4 +1,4 @@
-# M1 — Data Analysis and Problem Framing
+# M1 — Problem Identification and Framing
 
 ## 1. Problem statement (practitioner perspective)
 
@@ -100,4 +100,4 @@ The result includes parameters such as `ac_annual` (kWh/year), which we feed int
 - **Modelling assumptions:** The PVWatts output uses fixed assumption blocks (module type, system losses, performance ratio) and does not capture every site-specific variable (for example, shading, maintenance, unexpected degradation). [developer.nrel.gov](https://developer.nrel.gov/docs/solar/pvwatts/v8/?utm_source=chatgpt.com)  
 - **API constraints:** Rate limits apply (for example, NREL’s data download service: ~1000 requests/day, ~1 per 2 seconds for some endpoints), which influences batch processing strategies. [developer.nrel.gov](https://developer.nrel.gov/docs/solar/nsrdb/guide/?utm_source=chatgpt.com)  
 
-All scripts, data pipelines, and documentation are provided in the `/data_pipeline/` and `/data/` directories, enabling full reproducibility. The clean dataset is hosted as `final_dataset.csv` in the repo root, with documentation in `/data_pipeline/README.md`.
+Reusable API helpers and the sizing prototype live in `scripts/` (see `scripts/api.py`, `scripts/config.py`, and `scripts/README.md`). Datasets and cleaned outputs will be generated and documented in subsequent milestones; any derived files should be stored under `data/` with accompanying notes for reproducibility.
