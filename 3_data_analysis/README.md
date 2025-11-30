@@ -1,46 +1,36 @@
-## M3. Data Analysis — Solar PV + Battery Sizing
+# M3. Data Analysis — Solar PV + Battery Sizing
 
-This milestone tests our decision-support question with **transparent, question-first analysis** rather than complex ML. The goal is to propose feasible solar PV + battery system sizes for U.S. households using public data while clearly communicating uncertainty and reproducibility.
+This milestone tests the core research question with transparent, reproducible analysis rather than heavyweight ML. Methods must match the data we have (PVWatts outputs, tariff data, and user load/cost assumptions) and clearly communicate uncertainty.
 
-### Objectives and principles
-- Match methods to the question and available data (PVWatts outputs, tariff data, user load assumptions); keep techniques minimal and explainable.  
-- State the limits of what the analysis can answer and where the data is too weak.  
-- Quantify and communicate uncertainty (weather variance, tariff coverage, simplified load shapes) and record null or undesirable results.  
-- Make every step reproducible and reviewable by documenting code, assumptions, and artifacts.
+## Scope and approach
+- **Objective:** Recommend feasible PV + battery size bands for U.S. households using public data, while surfacing savings, payback, and backup-hour ranges.
+- **Inputs:** PVWatts v8 production (`ac_annual`, `ac_monthly`, `capacity_factor`), URDB/NREL utility tariffs, user-entered load and system cost assumptions (see `scripts/config.py`), optional SREC mappings.
+- **Methods:** Scenario tables across PV kW × battery kWh, bar/line charts for annual savings and payback, sensitivity on tariffs and system costs, and backup-hour estimates for critical loads.
+- **Uncertainty handling:** Present ranges (best/base/conservative) to reflect weather variability, tariff coverage gaps, and simplified load profiles; state caveats explicitly.
 
-### Analysis outline (to be expanded with results)
-- **Data inputs:** PVWatts production estimates, utility tariffs/URDB data, user-provided load and system cost assumptions.  
-- **Techniques:** scenario comparisons of PV/battery sizes, bar/line charts for annual savings and payback, sensitivity checks on key parameters.  
-- **Uncertainty handling:** error bars or ranges around production and savings; explicit caveats for tariff gaps and load simplifications.  
-- **Outputs:** recommended size bands, payback and bill-savings estimates, and narrative trade-offs for homeowners.
+## Data dependency and provenance
+- **Upstream dataset:** `2_data_collection/data/processed/solar_analysis_dataset.csv` (8 locations). Schema and pipeline are documented in `2_data_collection/data/README.md`; upstream scripts pull Nominatim geocodes, PVWatts v8 production, Utility Rates v3 tariffs, and static SREC/ITC/cost tables.  
+- **Upstream artifacts:** Raw API pulls live in `2_data_collection/data/raw/` (`geocode_results.json`, `pvwatts_results.json`, `utility_rates_results.json`). Visuals from M2 (irradiance, rates, SREC maps) are in `2_data_collection/data/visualizations/`; load profile mock is `2_data_collection/loadprofile.png`.  
+- **Fields consumed here:** `ac_annual_kwh`, `ac_monthly*`, `capacity_factor`, `electricity_rate_residential`, `utility_name`, `srec_price_per_mwh`, `system_cost_net`, `annual_savings`, `simple_payback_years`, `annual_srec_revenue`, `data_quality_score`.  
+- **Known limitations (must be repeated in results):** PVWatts uses TMY (±10–15% variance), URDB has ~15% utility gaps (state-average fallback), no shading or azimuth/tilt optimization (tilt = latitude, south-facing), 14% fixed losses, SREC prices are static snapshots.  
+- **Refresh guidance:** If you change locations, rerun the M2 pipeline before analysis (`fetch_geocode.py → fetch_pvwatts.py → fetch_rates.py → clean_merge_dataset.py → generate_visualizations.py`). Keep raw pulls in `2_data_collection/data/raw/` and outputs in `processed/`.
 
-### Non-technical findings (pending insertion)
-- Key takeaways: **TODO** summarize savings/payback ranges by representative ZIPs (e.g., CA/TX/FL) with uncertainty bands.  
-- Visuals: **TODO** include bar/line charts for savings vs. system size and battery backup hours; note best/base/conservative scenarios.  
-- Caveats: highlight tariff assumptions, TMY weather basis, and simplified load profiles.  
+## Current findings and gaps
+- **Status:** Final figures are not yet documented in this folder. The Flask prototype (`scripts/`) renders best/base/conservative scenarios interactively, but the static non-technical summary and technical appendix still need to be exported here.
+- **Required actions to complete M3:**
+  - Run the analysis notebook or script to generate savings/payback charts for representative ZIPs (e.g., CA, TX, FL) and export visuals.
+  - Write the non-technical summary that explains results, confidence levels, and caveats for homeowners.
+  - Document the technical methods, assumptions, and alternative approaches considered.
+  - Add group/individual retrospectives and note survey completion.
 
-### Technical appendix (methods & alternatives)
-- Methods: scenario tables (PV kW × battery kWh), payback computation using PVWatts `ac_annual` and utility rates; sensitivity on rate +/- and system cost +/-; battery backup hours estimated from critical load profile.  
-- Alternatives considered: higher-fidelity hourly load modelling, shaded roof modelling, Monte Carlo weather perturbations — deferred due to scope/time and data availability.  
-- Uncertainty quantification: ranges derived from tariff bands and ±10–20% production variability; note where data gaps require user confirmation.  
+## Reproducibility
+- **Environment:** `python -m venv .venv && source .venv/bin/activate && pip install -r scripts/requirements.txt`.
+- **Data pull:** Prefer reusing the processed CSV from M2. If regenerating, run the M2 pipeline in `2_data_collection/data/` (see that README) with `NREL_API_KEY` set in `.env` to refresh geocode/PVWatts/URDB data and SREC mappings.
+- **Execution:** Place notebooks or scripts for analysis under `3_data_analysis/` and export figures to this folder (or to `4_Communicating_Results/` if reused for M4). Record command order and expected inputs/outputs alongside the artifacts.
+- **Inputs/outputs:** Keep any new raw pulls in `data/raw/` (git-ignored) and processed outputs in `data/processed/`; include a short README if new files are added. If you modify the schema, update both this file and `2_data_collection/data/README.md`.
 
-### Replication checklist
-- Environment: `python -m venv .venv && source .venv/bin/activate && pip install -r scripts/requirements.txt`.  
-- Data pull: use `scripts/api.py` helpers to retrieve PVWatts and utility rates for test locations.  
-- Analysis artifacts: **TODO** add notebook/script path (e.g., `notebooks/03_analysis.ipynb`) and execution order; export figures to `3_reports/m4_communication/artifacts/` as needed.  
-- Inputs/outputs: document expected input format (location list, system cost assumptions) and where outputs are stored (`data/processed/` or `3_reports/`).  
 
-### Deliverables
-1. Non-technical findings with visuals, confidence levels, and clear caveats.  
-2. Technical appendix describing methods, rationale, known flaws, and alternative approaches.  
-3. Reproducibility package: scripts/notebooks and instructions to rerun the analysis on the same data.  
-4. Completed milestone survey per course requirements.  
-5. Tagged commit for this milestone (for example, `m3-data-analysis`) created before the deadline.  
-6. Group and individual retrospective capturing lessons and next-step adjustments.
+## Reference asset
+![System configuration options and financial metrics](system_config.png)
 
-### Replication notes (to be detailed alongside code)
-- Use the project Python environment (`python -m venv .venv && source .venv/bin/activate`) and track dependencies in `requirements.txt`.  
-- Keep raw data in `data/raw/` and processed outputs in `data/processed/` (both git-ignored).  
-- Document commands and notebook execution order alongside any new scripts so others can fully reproduce the results end-to-end.
-- The Flask sizing prototype in `scripts/` can be run locally or via Docker (see `scripts/README.md`) to regenerate scenario visuals; it requires `NREL_API_KEY` in `.env`.
-
+*Illustrative PV + battery options from the prototype: compares backup duration, usable capacity, costs, payback, and long-run profit for different battery sizes at a fixed PV size.*
