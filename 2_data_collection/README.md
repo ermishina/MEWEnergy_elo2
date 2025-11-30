@@ -58,10 +58,18 @@ python generate_visualizations.py  # writes to visualizations/
 
 ---
 
+### 4b) Why this is good for the analysis
+- **Geographic policy variation:** Visuals show solar incentives vary widely; most states rely only on the 30% federal ITC, while a few SREC states add extra revenue.  
+- **Economic impact examples:**  
+  - Massachusetts (6,627 kWh/yr): 6.627 MWh × $280/MWh ≈ $1,856/yr SREC revenue (~$46.4k over 25 years), making MA competitive despite lower solar resource.  
+  - Illinois (6,423 kWh/yr): 6.423 MWh × $70/MWh ≈ $450/yr (~$11.25k over 25 years); meaningful but less dramatic.  
+- **Real-world takeaway:** SREC availability is the exception, so most U.S. homeowners cannot rely on it—supporting the research focus on geographic optimization.
+
+---
+
 ### 5) Artifacts for reuse
 - Visuals for analysis/communication: see `data/visualizations/*.png` and `loadprofile.png`.  
 - Clean dataset for M3/M4: `processed/solar_analysis_dataset.csv` with schema documented in `data/README.md`.
 
 ---
-
 

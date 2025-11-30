@@ -274,17 +274,6 @@ Current dataset contains **8 sample locations** across diverse U.S. regions:
 | WA_001 | Pacific NW | Washington | 5,678 | $0.112 | 13.8 |
 
 **Key Insight**: High-rate states (MA, CA) have faster payback despite lower production than sunny states (AZ, TX) with low rates.
-
----
-
-## Changelog
-
-| Date | Change |
-|------|--------|
-| 2025-06-28 | Initial data collection pipeline created |
-| 2025-06-28 | Added 8 sample locations across U.S. regions |
-| 2025-06-28 | Implemented data quality scoring |
-
 ---
 
 *Last updated: June 2025 | MEWEnergy Team*
