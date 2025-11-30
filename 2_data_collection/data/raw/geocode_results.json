@@ -1,0 +1,262 @@
+{
+  "metadata": {
+    "source": "OpenStreetMap Nominatim API",
+    "endpoint": "https://nominatim.openstreetmap.org/search",
+    "fetch_timestamp": "2025-11-30T18:36:08.014259Z",
+    "total_addresses": 11,
+    "successful": 11,
+    "failed": 0
+  },
+  "data": [
+    {
+      "id": "MA_001",
+      "input_address": "77 Holworthy St Boston MA 02121",
+      "region": "Northeast",
+      "lat": 42.3168109,
+      "lon": -71.0913115,
+      "display_name": "77, Holworthy Street, Roxbury, Boston, Suffolk County, Massachusetts, 02121, United States of America",
+      "address_details": {
+        "house_number": "77",
+        "road": "Holworthy Street",
+        "suburb": "Roxbury",
+        "city": "Boston",
+        "county": "Suffolk County",
+        "state": "Massachusetts",
+        "ISO3166-2-lvl4": "US-MA",
+        "postcode": "02121",
+        "country": "United States of America",
+        "country_code": "us"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "CA_001",
+      "input_address": "2257 E Tyler Ave, Fresno, CA 93701",
+      "region": "West",
+      "lat": 36.755523,
+      "lon": -119.7843539,
+      "display_name": "2257, East Tyler Avenue, Fresno, Fresno County, California, 93701, United States of America",
+      "address_details": {
+        "house_number": "2257",
+        "road": "East Tyler Avenue",
+        "city": "Fresno",
+        "county": "Fresno County",
+        "state": "California",
+        "ISO3166-2-lvl4": "US-CA",
+        "postcode": "93701",
+        "country": "United States of America",
+        "country_code": "us"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "TX_001",
+      "input_address": "908 Jewell St, Austin, TX 78704",
+      "region": "South",
+      "lat": 30.2519575,
+      "lon": -97.7589382,
+      "display_name": "908, Jewell Street, Evergreen Heights, Austin, Travis County, Texas, 78704, United States of America",
+      "address_details": {
+        "house_number": "908",
+        "road": "Jewell Street",
+        "neighbourhood": "Evergreen Heights",
+        "city": "Austin",
+        "county": "Travis County",
+        "state": "Texas",
+        "ISO3166-2-lvl4": "US-TX",
+        "postcode": "78704",
+        "country": "United States of America",
+        "country_code": "us"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "FL_001",
+      "input_address": "400 Biscayne Boulevard, Miami, FL 33132",
+      "region": "Southeast",
+      "lat": 25.7786724,
+      "lon": -80.1889271,
+      "display_name": "400, Biscayne Boulevard, Torch of Friendship, Miami, Miami-Dade County, Florida, 33132, United States of America",
+      "address_details": {
+        "house_number": "400",
+        "road": "Biscayne Boulevard",
+        "hamlet": "Torch of Friendship",
+        "city": "Miami",
+        "county": "Miami-Dade County",
+        "state": "Florida",
+        "ISO3166-2-lvl4": "US-FL",
+        "postcode": "33132",
+        "country": "United States of America",
+        "country_code": "us"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "AZ_001",
+      "input_address": "100 North Central Avenue, Phoenix, AZ 85004",
+      "region": "Southwest",
+      "lat": 33.449438,
+      "lon": -112.073913,
+      "display_name": "100, North Central Avenue, Central City, Phoenix, Maricopa County, Arizona, 85004, United States of America",
+      "address_details": {
+        "house_number": "100",
+        "road": "North Central Avenue",
+        "suburb": "Central City",
+        "city": "Phoenix",
+        "county": "Maricopa County",
+        "state": "Arizona",
+        "ISO3166-2-lvl4": "US-AZ",
+        "postcode": "85004",
+        "country": "United States of America",
+        "country_code": "us"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "IL_001",
+      "input_address": "233 South Wacker Drive, Chicago, IL 60606",
+      "region": "Midwest",
+      "lat": 41.8787381,
+      "lon": -87.6359612,
+      "display_name": "Willis Tower, 233, South Wacker Drive, Loop, Chicago, South Chicago Township, Cook County, Illinois, 60606, United States of America",
+      "address_details": {
+        "building": "Willis Tower",
+        "house_number": "233",
+        "road": "South Wacker Drive",
+        "suburb": "Loop",
+        "city": "Chicago",
+        "municipality": "South Chicago Township",
+        "county": "Cook County",
+        "state": "Illinois",
+        "ISO3166-2-lvl4": "US-IL",
+        "postcode": "60606",
+        "country": "United States of America",
+        "country_code": "us"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "CO_001",
+      "input_address": "1144 15th Street, Denver, CO 80202",
+      "region": "Mountain",
+      "lat": 39.7470275,
+      "lon": -104.9976087,
+      "display_name": "1144 Fifteenth, 1144, 15th Street, Central Business District, Denver, Colorado, 80202, United States of America",
+      "address_details": {
+        "building": "1144 Fifteenth",
+        "house_number": "1144",
+        "road": "15th Street",
+        "neighbourhood": "Central Business District",
+        "city": "Denver",
+        "state": "Colorado",
+        "ISO3166-2-lvl4": "US-CO",
+        "postcode": "80202",
+        "country": "United States of America",
+        "country_code": "us"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "WA_001",
+      "input_address": "400 Broad Street, Seattle, WA 98109",
+      "region": "Pacific Northwest",
+      "lat": 47.6205131,
+      "lon": -122.3493036,
+      "display_name": "Space Needle, 400, Broad Street, South Lake Union, Cascade, Belltown, Seattle, King County, Washington, 98109, United States of America",
+      "address_details": {
+        "man_made": "Space Needle",
+        "house_number": "400",
+        "road": "Broad Street",
+        "neighbourhood": "South Lake Union",
+        "quarter": "Cascade",
+        "suburb": "Belltown",
+        "city": "Seattle",
+        "county": "King County",
+        "state": "Washington",
+        "ISO3166-2-lvl4": "US-WA",
+        "postcode": "98109",
+        "country": "United States of America",
+        "country_code": "us"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "NJ_001",
+      "input_address": "1 Main St, Newark, NJ 07102",
+      "region": "Northeast",
+      "lat": 40.729103,
+      "lon": -74.148802,
+      "display_name": "1, Main Street, East Ferry Neighborhood, The Ironbound, Newark, Essex County, New Jersey, 07105, United States of America",
+      "address_details": {
+        "house_number": "1",
+        "road": "Main Street",
+        "residential": "East Ferry Neighborhood",
+        "village": "The Ironbound",
+        "city": "Newark",
+        "county": "Essex County",
+        "state": "New Jersey",
+        "ISO3166-2-lvl4": "US-NJ",
+        "postcode": "07105",
+        "country": "United States of America",
+        "country_code": "us"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "DC_001",
+      "input_address": "1600 Pennsylvania Ave NW, Washington, DC 20500",
+      "region": "Mid-Atlantic",
+      "lat": 38.8976387,
+      "lon": -77.0365528,
+      "display_name": "White House, 1600, Pennsylvania Avenue Northwest, Downtown, Ward 2, Washington, District of Columbia, 20500, United States of America",
+      "address_details": {
+        "office": "White House",
+        "house_number": "1600",
+        "road": "Pennsylvania Avenue Northwest",
+        "suburb": "Downtown",
+        "borough": "Ward 2",
+        "city": "Washington",
+        "state": "District of Columbia",
+        "ISO3166-2-lvl4": "US-DC",
+        "postcode": "20500",
+        "country": "United States of America",
+        "country_code": "us"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": "PA_001",
+      "input_address": "1234 Market St, Philadelphia, PA 19107",
+      "region": "Northeast",
+      "lat": 39.9517176,
+      "lon": -75.1609552,
+      "display_name": "1234 Market, 1234, Market Street, Chinatown, Gayborhood, Center City, Philadelphia, Philadelphia County, Pennsylvania, 19107, United States of America",
+      "address_details": {
+        "building": "1234 Market",
+        "house_number": "1234",
+        "road": "Market Street",
+        "neighbourhood": "Chinatown",
+        "suburb": "Center City",
+        "city": "Philadelphia",
+        "county": "Philadelphia County",
+        "state": "Pennsylvania",
+        "ISO3166-2-lvl4": "US-PA",
+        "postcode": "19107",
+        "country": "United States of America",
+        "country_code": "us"
+      },
+      "success": true,
+      "error": null
+    }
+  ]
+}

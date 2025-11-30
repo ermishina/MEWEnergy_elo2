@@ -1,0 +1,372 @@
+{
+  "metadata": {
+    "source": "NREL Utility Rates API v3",
+    "endpoint": "https://developer.nrel.gov/api/utility_rates/v3.json",
+    "fetch_timestamp": "2025-11-30T18:37:36.292026Z",
+    "sectors_queried": [
+      "residential"
+    ],
+    "total_locations": 11,
+    "successful": 11,
+    "failed": 0
+  },
+  "srec_prices": {
+    "Massachusetts": 280.0,
+    "New Jersey": 220.0,
+    "Pennsylvania": 45.0,
+    "District of Columbia": 420.0,
+    "Maryland": 60.0,
+    "Illinois": 70.0,
+    "Ohio": 15.0,
+    "Virginia": 35.0,
+    "Delaware": 40.0,
+    "Rhode Island": 300.0
+  },
+  "data": [
+    {
+      "id": "MA_001",
+      "lat": 42.3168109,
+      "lon": -71.0913115,
+      "region": "Northeast",
+      "input_address": "77 Holworthy St Boston MA 02121",
+      "rates": {
+        "residential": {
+          "success": true,
+          "error": null,
+          "rate": 0.1491,
+          "sector": "residential",
+          "utility_name": "NSTAR Electric Co",
+          "raw_outputs": {
+            "company_id": "54913",
+            "utility_name": "NSTAR Electric Co",
+            "utility_info": [
+              {
+                "company_id": "54913",
+                "utility_name": "NSTAR Electric Co"
+              }
+            ],
+            "commercial": 0.1384,
+            "industrial": 0.1257,
+            "residential": 0.1491
+          }
+        }
+      },
+      "srec_price": 280.0,
+      "state": "Massachusetts"
+    },
+    {
+      "id": "CA_001",
+      "lat": 36.755523,
+      "lon": -119.7843539,
+      "region": "West",
+      "input_address": "2257 E Tyler Ave, Fresno, CA 93701",
+      "rates": {
+        "residential": {
+          "success": true,
+          "error": null,
+          "rate": 0.1559,
+          "sector": "residential",
+          "utility_name": "Pacific Gas & Electric Co",
+          "raw_outputs": {
+            "company_id": "14328",
+            "utility_name": "Pacific Gas & Electric Co",
+            "utility_info": [
+              {
+                "company_id": "14328",
+                "utility_name": "Pacific Gas & Electric Co"
+              }
+            ],
+            "commercial": 0.1408,
+            "industrial": 0.0898,
+            "residential": 0.1559
+          }
+        }
+      },
+      "srec_price": 0.0,
+      "state": "California"
+    },
+    {
+      "id": "TX_001",
+      "lat": 30.2519575,
+      "lon": -97.7589382,
+      "region": "South",
+      "input_address": "908 Jewell St, Austin, TX 78704",
+      "rates": {
+        "residential": {
+          "success": true,
+          "error": null,
+          "rate": 0.1044,
+          "sector": "residential",
+          "utility_name": "Austin Energy|TXU Energy Retail Co LP",
+          "raw_outputs": {
+            "company_id": "1015",
+            "utility_name": "Austin Energy|TXU Energy Retail Co LP",
+            "utility_info": [
+              {
+                "company_id": "1015",
+                "utility_name": "Austin Energy"
+              },
+              {
+                "company_id": null,
+                "utility_name": "TXU Energy Retail Co LP"
+              }
+            ],
+            "commercial": 0.0875,
+            "industrial": 0.0587,
+            "residential": 0.1044
+          }
+        }
+      },
+      "srec_price": 0.0,
+      "state": "Texas"
+    },
+    {
+      "id": "FL_001",
+      "lat": 25.7786724,
+      "lon": -80.1889271,
+      "region": "Southeast",
+      "input_address": "400 Biscayne Boulevard, Miami, FL 33132",
+      "rates": {
+        "residential": {
+          "success": true,
+          "error": null,
+          "rate": 0.104,
+          "sector": "residential",
+          "utility_name": "Florida Power & Light Co",
+          "raw_outputs": {
+            "company_id": "6452",
+            "utility_name": "Florida Power & Light Co",
+            "utility_info": [
+              {
+                "company_id": "6452",
+                "utility_name": "Florida Power & Light Co"
+              }
+            ],
+            "commercial": 0.0872,
+            "industrial": 0.0686,
+            "residential": 0.104
+          }
+        }
+      },
+      "srec_price": 0.0,
+      "state": "Florida"
+    },
+    {
+      "id": "AZ_001",
+      "lat": 33.449438,
+      "lon": -112.073913,
+      "region": "Southwest",
+      "input_address": "100 North Central Avenue, Phoenix, AZ 85004",
+      "rates": {
+        "residential": {
+          "success": true,
+          "error": null,
+          "rate": 0.1196,
+          "sector": "residential",
+          "utility_name": "Arizona Public Service Co",
+          "raw_outputs": {
+            "company_id": "803",
+            "utility_name": "Arizona Public Service Co",
+            "utility_info": [
+              {
+                "company_id": "803",
+                "utility_name": "Arizona Public Service Co"
+              }
+            ],
+            "commercial": 0.1022,
+            "industrial": 0.0787,
+            "residential": 0.1196
+          }
+        }
+      },
+      "srec_price": 0.0,
+      "state": "Arizona"
+    },
+    {
+      "id": "IL_001",
+      "lat": 41.8787381,
+      "lon": -87.6359612,
+      "region": "Midwest",
+      "input_address": "233 South Wacker Drive, Chicago, IL 60606",
+      "rates": {
+        "residential": {
+          "success": true,
+          "error": null,
+          "rate": 0.1044,
+          "sector": "residential",
+          "utility_name": "Commonwealth Edison Co",
+          "raw_outputs": {
+            "company_id": "4110",
+            "utility_name": "Commonwealth Edison Co",
+            "utility_info": [
+              {
+                "company_id": "4110",
+                "utility_name": "Commonwealth Edison Co"
+              }
+            ],
+            "commercial": 0.0405,
+            "industrial": 0.0139,
+            "residential": 0.1044
+          }
+        }
+      },
+      "srec_price": 70.0,
+      "state": "Illinois"
+    },
+    {
+      "id": "CO_001",
+      "lat": 39.7470275,
+      "lon": -104.9976087,
+      "region": "Mountain",
+      "input_address": "1144 15th Street, Denver, CO 80202",
+      "rates": {
+        "residential": {
+          "success": true,
+          "error": null,
+          "rate": 0.1105,
+          "sector": "residential",
+          "utility_name": "Public Service Co of Colorado",
+          "raw_outputs": {
+            "company_id": "15466",
+            "utility_name": "Public Service Co of Colorado",
+            "utility_info": [
+              {
+                "company_id": "15466",
+                "utility_name": "Public Service Co of Colorado"
+              }
+            ],
+            "commercial": 0.0916,
+            "industrial": 0.0604,
+            "residential": 0.1105
+          }
+        }
+      },
+      "srec_price": 0.0,
+      "state": "Colorado"
+    },
+    {
+      "id": "WA_001",
+      "lat": 47.6205131,
+      "lon": -122.3493036,
+      "region": "Pacific Northwest",
+      "input_address": "400 Broad Street, Seattle, WA 98109",
+      "rates": {
+        "residential": {
+          "success": true,
+          "error": null,
+          "rate": 0.0775,
+          "sector": "residential",
+          "utility_name": "Seattle City Light",
+          "raw_outputs": {
+            "company_id": "16868",
+            "utility_name": "Seattle City Light",
+            "utility_info": [
+              {
+                "company_id": "16868",
+                "utility_name": "Seattle City Light"
+              }
+            ],
+            "commercial": 0.068,
+            "industrial": 0.0595,
+            "residential": 0.0775
+          }
+        }
+      },
+      "srec_price": 0.0,
+      "state": "Washington"
+    },
+    {
+      "id": "NJ_001",
+      "lat": 40.729103,
+      "lon": -74.148802,
+      "region": "Northeast",
+      "input_address": "1 Main St, Newark, NJ 07102",
+      "rates": {
+        "residential": {
+          "success": true,
+          "error": null,
+          "rate": 0.1488,
+          "sector": "residential",
+          "utility_name": "Public Service Electric & Gas Co",
+          "raw_outputs": {
+            "company_id": "15477",
+            "utility_name": "Public Service Electric & Gas Co",
+            "utility_info": [
+              {
+                "company_id": "15477",
+                "utility_name": "Public Service Electric & Gas Co"
+              }
+            ],
+            "commercial": 0.0738,
+            "industrial": 0.0474,
+            "residential": 0.1488
+          }
+        }
+      },
+      "srec_price": 220.0,
+      "state": "New Jersey"
+    },
+    {
+      "id": "DC_001",
+      "lat": 38.8976387,
+      "lon": -77.0365528,
+      "region": "Mid-Atlantic",
+      "input_address": "1600 Pennsylvania Ave NW, Washington, DC 20500",
+      "rates": {
+        "residential": {
+          "success": true,
+          "error": null,
+          "rate": 0.1098,
+          "sector": "residential",
+          "utility_name": "Potomac Electric Power Co",
+          "raw_outputs": {
+            "company_id": "15270",
+            "utility_name": "Potomac Electric Power Co",
+            "utility_info": [
+              {
+                "company_id": "15270",
+                "utility_name": "Potomac Electric Power Co"
+              }
+            ],
+            "commercial": 0.0479,
+            "industrial": 0.0134,
+            "residential": 0.1098
+          }
+        }
+      },
+      "srec_price": 420.0,
+      "state": "District of Columbia"
+    },
+    {
+      "id": "PA_001",
+      "lat": 39.9517176,
+      "lon": -75.1609552,
+      "region": "Northeast",
+      "input_address": "1234 Market St, Philadelphia, PA 19107",
+      "rates": {
+        "residential": {
+          "success": true,
+          "error": null,
+          "rate": 0.129,
+          "sector": "residential",
+          "utility_name": "PECO Energy Co",
+          "raw_outputs": {
+            "company_id": "14940",
+            "utility_name": "PECO Energy Co",
+            "utility_info": [
+              {
+                "company_id": "14940",
+                "utility_name": "PECO Energy Co"
+              }
+            ],
+            "commercial": 0.0604,
+            "industrial": 0.0152,
+            "residential": 0.129
+          }
+        }
+      },
+      "srec_price": 45.0,
+      "state": "Pennsylvania"
+    }
+  ]
+}

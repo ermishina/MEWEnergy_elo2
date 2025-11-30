@@ -1,67 +1,67 @@
-## M2. Research Question & Data Modeling
+## M2. Data Collection and Modeling
 
-> **How can open-access solar radiation data and public APIs be used to model and predict the optimal solar and battery system size for U.S. households to maximize energy cost savings and minimize payback time?**
+> **Research question:** How can open-access solar radiation data and public APIs be used to model and predict the optimal solar and battery system size for U.S. households to maximize energy cost savings and minimize payback time?
 
-This question defines our analytical focus and guides the platform’s architecture and data selection strategy.
-
----
-
-### 1. Non-Technical Explanation: Modeling the Domain
-
-Our domain represents the decision-making process of a U.S. homeowner who wants to estimate whether investing in a solar PV and battery system is financially viable.  
-To model this scenario, we identify **three main components**:
-
-1. **Environmental Factors:** solar irradiance, temperature, weather patterns.  
-   → Collected from *NREL’s PVWatts API* (based on NSRDB TMY data).  
-2. **Economic Factors:** utility rates, incentives, and SREC market data.  
-   → From *NREL Utility Rates API*, *OpenEI URDB*, and *IRS Section 25D*.  
-3. **Technical Factors:** PV system capacity, inverter efficiency, battery capacity.  
-   → Modeled through user input + performance parameters returned by PVWatts (`ac_annual`, `capacity_factor`, etc.).  
-
-We use these variables to build a simplified **energy-balance model** that estimates how much grid electricity is offset by solar generation and how storage affects self-consumption.  
-This model enables an estimation of **annual savings** and **payback period** using publicly available data sources.
-
-**Possible Flaws & Limitations**
-- Simplified consumption patterns (no hourly load profile data for all regions).
-- Static assumptions on system degradation and efficiency.
-- SREC market data not uniform across all states.
-- Exclusion of installation-specific constraints (e.g., shading, tilt errors).
+This milestone captures how we model the domain, which data we collect, and how to reproduce the prepared dataset.
 
 ---
 
-### 2. Data Sources and Documentation
+### 1) Domain model (non-technical)
+- **Environmental:** solar irradiance and production from NREL PVWatts v8 (NSRDB TMY) and Solar Resource data.  
+- **Economic:** retail tariffs and DG rules from OpenEI URDB / NREL Utility Rates; incentives via IRS Section 25D; optional SREC price table.  
+- **Technical:** PV DC capacity, tilt = latitude, south-facing azimuth, 14% losses; battery capacity captured in later milestones.  
+These inputs drive an energy-balance and financial model to estimate bill offset, annual savings, and payback.
 
-| Category | API / Dataset | Provider | Description | Known Limitations |
-|-----------|----------------|-----------|--------------|------------------|
-| Solar Irradiance | [NREL PVWatts® v8](https://developer.nrel.gov/api/pvwatts/v8.json) | U.S. DOE / NREL | Solar generation estimate using NSRDB TMY data | Weather-year approximation (TMY) |
-| Utility Rates | [OpenEI URDB](https://openei.org/services/doc/rest/util_rates/) | OpenEI | Electricity tariffs, net-metering & DG rules | Data gaps for small utilities |
-| Location | [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org/) | OSM Foundation | Converts address → coordinates | Requires rate-limited API usage |
-| Incentives | [IRS Section 25D](https://www.irs.gov/credits-deductions/residential-clean-energy-credit) | IRS / U.S. Gov | 30 % tax credit | Federal scope only |
-| SREC Markets | [SRECTrade API](https://www.srectrade.com/about) | SRECTrade | Market prices for state SREC credits | Not all states participate |
-
-**WARNING: Free-tier API limits**  
-PVWatts and Nominatim enforce strict rate limits (a few requests per hour on free keys), so bulk validation or large batch pulls are not feasible without a paid or whitelisted subscription. Keep calls minimal, cache responses, and stagger any test runs to avoid throttling.
+**Known limitations:** simplified load profiles (no smart-meter detail), TMY weather averages, uneven URDB coverage, no shading analysis, and static system cost assumptions.
 
 ---
 
-### 3. Data Cleaning & Structure
+### 2) Data sources
+| Category | API / dataset | Notes |
+| --- | --- | --- |
+| Geocoding | OpenStreetMap Nominatim | `fetch_geocode.py`; rate-limit friendly. |
+| Solar production | NREL PVWatts v8 | `fetch_pvwatts.py`; requires `NREL_API_KEY`. |
+| Solar resource | NREL Solar Resource v1 | Included in PVWatts pulls for irradiance context. |
+| Utility rates | NREL Utility Rates v3 / URDB | `fetch_rates.py`; fills residential/commercial prices. |
+| Incentives/SREC | IRS 25D (30% ITC), SRECTrade table | SREC values manual/CSV lookup in pipeline. |
 
-Raw data from the APIs will be collected as JSON files and standardized into a **relational CSV schema** with the following structure:
+---
 
-| Column | Description | Source |
-|---------|--------------|--------|
-| `latitude`, `longitude` | Coordinates for location | Nominatim |
-| `ac_annual` | Annual AC energy output (kWh) | PVWatts |
-| `utility_rate` | Retail price (¢/kWh) | URDB |
-| `system_cost` | Estimated installed cost ($) | user input / average state cost |
-| `incentive_tax_credit` | 30% cost reduction | IRS 25D |
-| `srec_value` | State-level credit value ($/MWh) | SRECTrade |
-| `annual_savings` | Calculated result | derived |
-| `payback_period` | Calculated result | derived |
+### 3) Pipeline and folder structure (`2_data_collection/data/`)
+- **Scripts:** `fetch_geocode.py`, `fetch_pvwatts.py`, `fetch_rates.py`, `clean_merge_dataset.py`, `generate_visualizations.py`.  
+- **Raw pulls:** `data/raw/` (`geocode_results.json`, `pvwatts_results.json`, `utility_rates_results.json`).  
+- **Processed dataset:** `data/processed/solar_analysis_dataset.csv` (8 sample locations with production, tariffs, savings, and payback).  
+- **Visuals:** `data/visualizations/` (irradiance, rates, geographic maps, SREC pricing).  
+- **Config:** `data/.env` (set `NREL_API_KEY`).
 
-All intermediate processing (JSON → CSV → analysis-ready dataset) will be scripted in Python for full reproducibility.  
-Scripts **to be added** (e.g., `fetch_pv_data.py`, `fetch_rates.py`, `clean_merge_dataset.py`) and stored alongside this repo (path TBD).
-#### Sample visual: load vs solar vs battery flow
-![Realistic daily load profile and energy flow](loadprofile.png)
+**Reproduction (from `2_data_collection/data/`):**
+```bash
+pip install -r ../../scripts/requirements.txt  # or minimal: requests python-dotenv
 
-*Example day-level illustration of residential load (orange), solar generation (yellow), and battery charge/discharge (green). Used to validate API-derived outputs against a plausible shape before financial modeling.*
+# Add your API key (either export or create a .env with NREL_API_KEY=...)
+export NREL_API_KEY=...
+# or: printf \"NREL_API_KEY=YOUR_KEY\" > .env
+
+python fetch_geocode.py --use-samples --output raw/
+python fetch_pvwatts.py --geocode-file raw/geocode_results.json --output raw/
+python fetch_rates.py --geocode-file raw/geocode_results.json --output raw/
+python clean_merge_dataset.py --raw-dir raw/ --output processed/solar_analysis_dataset.csv
+python generate_visualizations.py  # writes to visualizations/
+```
+
+---
+
+### 4) Dataset snapshot (processed)
+- File: `2_data_collection/data/processed/solar_analysis_dataset.csv`  
+- Rows: 8 sample U.S. locations; Columns include `ac_annual_kwh`, `capacity_factor`, monthly `ac_*`, `electricity_rate_residential`, `utility_name`, `srec_price_per_mwh`, `system_cost_net`, `annual_savings`, `simple_payback_years`, `data_quality_score`.  
+- Key insight: high-rate states (MA, CA) show faster payback despite lower production than sunnier low-rate states (AZ, TX).
+
+---
+
+### 5) Artifacts for reuse
+- Visuals for analysis/communication: see `data/visualizations/*.png` and `loadprofile.png`.  
+- Clean dataset for M3/M4: `processed/solar_analysis_dataset.csv` with schema documented in `data/README.md`.
+
+---
+
+
