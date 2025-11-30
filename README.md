@@ -22,9 +22,9 @@
 - Tag: create `m0-setup` on the final M0 commit before M1 work begins.
 - Survey: complete the M0 course survey (note completion in meeting notes).
 
-## [M1. Domain Research & Background](1_data_analysis/README.md)
+## [M1. Domain Research & Background](1_problem_identification/README.md)
 
-This milestone consolidates our understanding of the U.S. residential solar-plus-storage domain and formalizes the research question that drives subsequent work. The full narrative, literature review, and analytical framing are documented in `0_domain_study/README.md` and `1_data_analysis/README.md`.
+This milestone consolidates our understanding of the U.S. residential solar-plus-storage domain and formalizes the research question that drives subsequent work. The full narrative, literature review, and analytical framing are documented in `0_domain_study/README.md` and `1_problem_identification/README.md`.
 
 For Milestone 1, we provide the following deliverables:
 
@@ -78,6 +78,13 @@ All inputs are sourced through **public, reproducible APIs** (NREL, OpenEI, IRS,
 
 Despite these constraints, the model provides a **transparent, data-driven baseline** for evaluating residential solar and battery investments at scale and serves as the analytical backbone for subsequent milestones in this project.
 
+### Data pipeline assets (M2)
+- Scripts and raw pulls live in `2_data_collection/data/` (`fetch_geocode.py`, `fetch_pvwatts.py`, `fetch_rates.py`, `clean_merge_dataset.py`, `generate_visualizations.py`).  
+- Raw API responses: `2_data_collection/data/raw/`.  
+- Processed dataset: `2_data_collection/data/processed/solar_analysis_dataset.csv` (8 sample locations with production, rates, and payback fields).  
+- Visual outputs: `2_data_collection/data/visualizations/`.  
+- For full steps, see `2_data_collection/data/README.md`; set `NREL_API_KEY` in `2_data_collection/data/.env` before running the pipeline.
+
 
 ## [M3. Data Analysis](3_data_analysis/README.md)
 
@@ -114,11 +121,11 @@ This milestone turns our analysis into audience-fit messaging for U.S. homeowner
 ### Communication artifact
 - Medium: mobile-first landing page with an embedded scenario snapshot (from `scripts/`), plus a printable 2-page brief for HOA/email/WhatsApp distribution.  
 - Rationale: fits mobile sharing habits, fast to skim, localized by ZIP to build trust.  
-- Assets: live in `3_reports/m4_communication/artifacts/` (built from PVWatts + URDB data and the Flask visuals).  
+- Assets: will be stored under `4_Communicating_Results/` (built from PVWatts + URDB data and the Flask visuals).  
 
 ### M4 deliverables
-1. Audience & strategy doc with personas, goals, channels, and success criteria (`3_reports/m4_communication/strategy.md`).  
-2. Communication artifact aligned to the strategy (PDF/landing copy) in `3_reports/m4_communication/artifacts/`.  
+1. Audience & strategy doc with personas, goals, channels, and success criteria (`4_Communicating_Results/strategy.md`).  
+2. Communication artifact aligned to the strategy (PDF/landing copy) in `4_Communicating_Results/artifacts/`.  
 3. Completed milestone survey (course requirement).  
 4. Tagged commit created before the deadline (planned tag: `m4-communication`).  
 5. Group and individual retrospective stored alongside the artifact.  
@@ -205,6 +212,32 @@ By bridging **publicly available U.S. energy data** and **consumer decision tool
 │       ├── index.html
 │       ├── results.html
 │       └── sizing.html
+├── 2_data_collection/
+│   ├── README.md
+│   ├── loadprofile.png
+│   └── data/
+│       ├── .env
+│       ├── README.md
+│       ├── fetch_geocode.py
+│       ├── fetch_pvwatts.py
+│       ├── fetch_rates.py
+│       ├── clean_merge_dataset.py
+│       ├── generate_visualizations.py
+│       ├── raw/
+│       │   ├── geocode_results.json
+│       │   ├── pvwatts_results.json
+│       │   └── utility_rates_results.json
+│       ├── processed/
+│       │   └── solar_analysis_dataset.csv
+│       └── visualizations/
+│           ├── srec_pricing_analysis.png
+│           ├── irradiance_by_region.png
+│           ├── seasonal_production_comparison.png
+│           ├── latitude_analysis.png
+│           ├── production_geographic_map.png
+│           ├── location_summary_table.png
+│           ├── electricity_rates_comparison.png
+│           └── performance_metrics_summary.png
 ├── .gitignore
 ├── LICENSE
 └── README.md
