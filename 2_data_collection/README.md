@@ -39,6 +39,9 @@ This model enables an estimation of **annual savings** and **payback period** us
 | Incentives | [IRS Section 25D](https://www.irs.gov/credits-deductions/residential-clean-energy-credit) | IRS / U.S. Gov | 30 % tax credit | Federal scope only |
 | SREC Markets | [SRECTrade API](https://www.srectrade.com/about) | SRECTrade | Market prices for state SREC credits | Not all states participate |
 
+**WARNING: Free-tier API limits**  
+PVWatts and Nominatim enforce strict rate limits (a few requests per hour on free keys), so bulk validation or large batch pulls are not feasible without a paid or whitelisted subscription. Keep calls minimal, cache responses, and stagger any test runs to avoid throttling.
+
 ---
 
 ### 3. Data Cleaning & Structure
@@ -58,4 +61,7 @@ Raw data from the APIs will be collected as JSON files and standardized into a *
 
 All intermediate processing (JSON → CSV → analysis-ready dataset) will be scripted in Python for full reproducibility.  
 Scripts **to be added** (e.g., `fetch_pv_data.py`, `fetch_rates.py`, `clean_merge_dataset.py`) and stored alongside this repo (path TBD).
+#### Sample visual: load vs solar vs battery flow
+![Realistic daily load profile and energy flow](loadprofile.png)
 
+*Example day-level illustration of residential load (orange), solar generation (yellow), and battery charge/discharge (green). Used to validate API-derived outputs against a plausible shape before financial modeling.*
