@@ -101,7 +101,7 @@ A lightweight Flask prototype that exercises the sizing logic and visual outputs
 
 ---
 
-## [M4. Communicating Results](3_reports/m4_communication/strategy.md)
+## [M4. Communicating Results](4_Communicating_Results/README.md)
 
 This milestone turns our analysis into audience-fit messaging for U.S. homeowners deciding whether rooftop solar plus a battery is worth it.
 
